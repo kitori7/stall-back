@@ -3,6 +3,7 @@ const ERROR_TYPE = {
   USER_ALREADY_EXISTS: "user_already_exists",
   USER_DOES_NOT_EXIST: "user_does_not_exist",
   PASSWORD_IS_INCORRECT: "password_is_incorrect",
+  UNAUTHORIZED: "unauthorized",
 };
 
 module.exports = ERROR_TYPE;

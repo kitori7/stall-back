@@ -4,6 +4,7 @@ const {
   verifyUser,
   handlePassword,
   verifyPassword,
+  verifyAuth,
 } = require("../middleware/user.middleware");
 const userRouter = new KoaRouter({
   prefix: "/user",
@@ -12,9 +13,7 @@ const userRouter = new KoaRouter({
 // 后台用户注册接口
 userRouter.post(
   "/register",
-  async (ctx, next) => {
-    await verifyUser("REGISTER", ctx, next);
-  },
+  verifyUser("REGISTER"),
   handlePassword,
   userController.create
 );
@@ -22,11 +21,12 @@ userRouter.post(
 // 后台用户登录接口
 userRouter.post(
   "/login",
-  async (ctx, next) => {
-    await verifyUser("LOGIN", ctx, next);
-  },
+  verifyUser("LOGIN"),
   verifyPassword,
   userController.login
 );
+
+// 验证token
+userRouter.get("/test", verifyAuth, userController.test);
 
 module.exports = userRouter;

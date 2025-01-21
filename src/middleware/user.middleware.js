@@ -1,30 +1,38 @@
 const UserService = require("../service/user.service");
 const ERROR_TYPE = require("../config/error");
 const md5password = require("../utils/md5-password");
+const jwt = require("jsonwebtoken");
+const { PUBLIC_KEY } = require("../config/secret");
 
-const verifyUser = async (type, ctx, next) => {
-  const { username, password } = ctx.request.body;
+const verifyUser = (type) => {
+  return async (ctx, next) => {
+    const { username, password } = ctx.request.body;
 
-  // 判断用户是否为空
-  if (!username || !password) {
-    return ctx.app.emit("error", ERROR_TYPE.NAME_OR_PASSWORD_IS_REQUIRED, ctx);
-  }
-
-  // 注册判断用户是否存在
-  const user = await UserService.getUserByUsername(username);
-  if (type === "REGISTER") {
-    if (user.length > 0) {
-      return ctx.app.emit("error", ERROR_TYPE.USER_ALREADY_EXISTS, ctx);
+    // 判断用户是否为空
+    if (!username || !password) {
+      return ctx.app.emit(
+        "error",
+        ERROR_TYPE.NAME_OR_PASSWORD_IS_REQUIRED,
+        ctx
+      );
     }
-  }
 
-  // 登录判断用户是否存在
-  if (type === "LOGIN") {
-    if (user.length === 0) {
-      return ctx.app.emit("error", ERROR_TYPE.USER_DOES_NOT_EXIST, ctx);
+    // 注册判断用户是否存在
+    const user = await UserService.getUserByUsername(username);
+    if (type === "REGISTER") {
+      if (user.length > 0) {
+        return ctx.app.emit("error", ERROR_TYPE.USER_ALREADY_EXISTS, ctx);
+      }
     }
-  }
-  await next();
+
+    // 登录判断用户是否存在
+    if (type === "LOGIN") {
+      if (user.length === 0) {
+        return ctx.app.emit("error", ERROR_TYPE.USER_DOES_NOT_EXIST, ctx);
+      }
+    }
+    await next();
+  };
 };
 // 加密密码
 const handlePassword = async (ctx, next) => {
@@ -45,8 +53,27 @@ const verifyPassword = async (ctx, next) => {
   await next();
 };
 
+// 验证token
+const verifyAuth = async (ctx, next) => {
+  if (!ctx.headers.authorization) {
+    return ctx.app.emit("error", ERROR_TYPE.UNAUTHORIZED, ctx);
+  }
+
+  const token = ctx.headers.authorization.replace("Bearer ", "");
+  try {
+    const decoded = jwt.verify(token, PUBLIC_KEY, {
+      algorithms: ["RS256"],
+    });
+    ctx.user = decoded;
+    await next();
+  } catch (error) {
+    return ctx.app.emit("error", ERROR_TYPE.UNAUTHORIZED, ctx);
+  }
+};
+
 module.exports = {
   verifyUser,
   handlePassword,
   verifyPassword,
+  verifyAuth,
 };

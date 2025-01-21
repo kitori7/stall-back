@@ -21,6 +21,10 @@ app.on("error", (error, ctx) => {
       code = -1004;
       message = "密码错误";
       break;
+    case ERROR_TYPE.UNAUTHORIZED:
+      code = -1005;
+      message = "未授权";
+      break;
     default:
       code = -1000;
       message = "未知错误";

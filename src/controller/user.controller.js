@@ -1,9 +1,10 @@
 const jwt = require("jsonwebtoken");
 const UserService = require("../service/user.service");
-const { PRIVATE_KEY } = require("../config/screct");
+const { PRIVATE_KEY } = require("../config/secret");
 class UserController {
   async create(ctx) {
-    const result = await UserService.create(ctx.request.body);
+    const data = await UserService.create(ctx.request.body);
+    ctx.app.emit("success", ctx, data, "用户注册成功");
     ctx.body = {
       code: 200,
       data: result,
@@ -18,13 +19,12 @@ class UserController {
       expiresIn: "1h",
       algorithm: "RS256",
     });
-    console.log(ctx.request.body);
 
-    ctx.body = {
-      code: 200,
-      data: { token, id, username },
-      message: "用户登录成功",
-    };
+    ctx.app.emit("success", ctx, { token, id, username }, "用户登录成功");
+  }
+
+  async test(ctx) {
+    ctx.app.emit("success", ctx, true, "用户登录成功");
   }
 }
 
