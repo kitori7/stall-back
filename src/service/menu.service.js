@@ -28,7 +28,7 @@ class MenuService {
 
   // 查询所有菜单
   async getAllMenus() {
-    const statement = `SELECT * FROM admin_menu;`;
+    const statement = `SELECT id, menu_name menuName, route_name routeName, created_at createdAt, updated_at updatedAt FROM admin_menu;`;
     const [result] = await connection.execute(statement);
     return result;
   }

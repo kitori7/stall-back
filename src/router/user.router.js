@@ -26,7 +26,16 @@ userRouter.post(
   userController.login
 );
 
-// 验证token
-userRouter.get("/test", verifyAuth, userController.test);
+// 查询所有用户接口
+userRouter.post("/", verifyAuth, userController.list);
+
+// 查询用户详情接口
+userRouter.get("/:id", verifyAuth, userController.detail);
+
+// 更新用户信息接口
+userRouter.patch("/:id", verifyAuth, handlePassword, userController.update);
+
+// 删除用户接口
+userRouter.delete("/:id", verifyAuth, userController.delete);
 
 module.exports = userRouter;

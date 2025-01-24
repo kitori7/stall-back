@@ -4,6 +4,7 @@ const ERROR_TYPE = require("../config/error");
 app.on("error", (error, ctx) => {
   let code = 0;
   let message = "";
+
   switch (error) {
     case ERROR_TYPE.NAME_OR_PASSWORD_IS_REQUIRED:
       code = -1001;
@@ -24,6 +25,14 @@ app.on("error", (error, ctx) => {
     case ERROR_TYPE.UNAUTHORIZED:
       code = -1005;
       message = "未授权";
+      break;
+    case ERROR_TYPE.SERVER_ERROR:
+      code = -1006;
+      message = "服务器错误";
+      break;
+    case ERROR_TYPE.ROLE_EXIST:
+      code = -1007;
+      message = "角色已存在";
       break;
     default:
       code = -1000;

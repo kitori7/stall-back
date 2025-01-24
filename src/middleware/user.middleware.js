@@ -37,7 +37,9 @@ const verifyUser = (type) => {
 // 加密密码
 const handlePassword = async (ctx, next) => {
   const { password } = ctx.request.body;
-  ctx.request.body.password = md5password(password);
+  if (password) {
+    ctx.request.body.password = md5password(password);
+  }
   await next();
 };
 
@@ -58,7 +60,6 @@ const verifyAuth = async (ctx, next) => {
   if (!ctx.headers.authorization) {
     return ctx.app.emit("error", ERROR_TYPE.UNAUTHORIZED, ctx);
   }
-
   const token = ctx.headers.authorization.replace("Bearer ", "");
   try {
     const decoded = jwt.verify(token, PUBLIC_KEY, {

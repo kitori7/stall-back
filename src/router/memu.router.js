@@ -6,6 +6,7 @@ const {
   list,
 } = require("../controller/menu.controller");
 const { verifyAuth } = require("../middleware/user.middleware");
+
 const menuRouter = new KoaRouter({
   prefix: "/menu",
 });
@@ -20,6 +21,6 @@ menuRouter.patch("/:id", verifyAuth, update);
 menuRouter.delete("/:id", verifyAuth, remove);
 
 // 获取菜单列表
-menuRouter.get("/", list);
+menuRouter.get("/", verifyAuth, list);
 
 module.exports = menuRouter;

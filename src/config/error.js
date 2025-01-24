@@ -4,6 +4,8 @@ const ERROR_TYPE = {
   USER_DOES_NOT_EXIST: "user_does_not_exist",
   PASSWORD_IS_INCORRECT: "password_is_incorrect",
   UNAUTHORIZED: "unauthorized",
+  SERVER_ERROR: "server_error",
+  ROLE_EXIST: "role_exist",
 };
 
 module.exports = ERROR_TYPE;
