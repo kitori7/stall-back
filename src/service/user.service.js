@@ -47,26 +47,65 @@ class UserService {
   }
 
   async getUserById(id) {
-    const sql = `SELECT au.id, au.username, au.roles_id rolesId
-    FROM admin_user AS au 
-    WHERE au.id = ?`;
-    const [result] = await connection.execute(sql, [id]);
-    return result[0];
+    try {
+      const sql = `
+        WITH Permissions AS (
+          SELECT rp.roles_id, JSON_ARRAYAGG(JSON_OBJECT('permissionName', ap.permission_name, 'permissionCode', ap.permission_code)) AS permissions
+          FROM roles_permissions rp
+          LEFT JOIN admin_permissions ap ON rp.permissions_id = ap.id
+          GROUP BY rp.roles_id
+        ),
+        Menus AS (
+          SELECT rm.roles_id, JSON_ARRAYAGG(JSON_OBJECT('menuName', am.menu_name, 'routeName', am.route_name)) AS menus
+          FROM roles_menu rm
+          LEFT JOIN admin_menu am ON rm.menu_id = am.id
+          GROUP BY rm.roles_id
+        )
+        SELECT 
+          au.id, 
+          au.username, 
+          au.roles_id AS rolesId,
+          COALESCE(p.permissions, JSON_OBJECT()) AS permissions,
+          COALESCE(m.menus, JSON_OBJECT()) AS menus
+        FROM 
+          admin_user au
+        LEFT JOIN 
+          Permissions p ON au.roles_id = p.roles_id
+        LEFT JOIN 
+          Menus m ON au.roles_id = m.roles_id
+        WHERE 
+          au.id = ?;
+`;
+      const [result] = await connection.execute(sql, [id]);
+      return result[0];
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async updateUser(id, userInfo) {
     try {
       const { rolesId, password } = userInfo;
-      let sql = "UPDATE admin_user SET roles_id = ?";
-      const params = [rolesId];
+      let sql = "UPDATE admin_user SET ";
+      const params = [];
+
+      if (rolesId) {
+        sql += "roles_id = ?";
+        params.push(rolesId);
+      }
 
       if (password) {
-        sql += ", password = ?";
+        if (params.length > 0) {
+          sql += ", ";
+        }
+        sql += "password = ?";
         params.push(password);
       }
 
-      sql += " WHERE id = ?";
-      params.push(id);
+      if (id) {
+        sql += " WHERE id = ?";
+        params.push(id);
+      }
 
       const [result] = await connection.execute(sql, params);
       return result;

@@ -14,8 +14,8 @@ class UserController {
       expiresIn: "1h",
       algorithm: "RS256",
     });
-
-    ctx.app.emit("success", ctx, { token, id, username }, "用户登录成功");
+    const res = await UserService.getUserById(id);
+    ctx.app.emit("success", ctx, { ...res, token }, "用户登录成功");
   }
   async list(ctx) {
     try {
@@ -52,7 +52,6 @@ class UserController {
     try {
       const { id } = ctx.params;
       const { rolesId, password } = ctx.request.body;
-      console.log(id, rolesId, password);
       await UserService.updateUser(id, {
         rolesId,
         password,
