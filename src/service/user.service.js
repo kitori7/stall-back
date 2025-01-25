@@ -119,6 +119,19 @@ class UserService {
     const [result] = await connection.execute(sql, [id]);
     return result;
   }
+
+  // stall用户
+  async createStallUser(username, password, phoneNumber, roleType) {
+    const sql =
+      "INSERT INTO `stall_user` (username, password, phone_number, role_type) VALUES (?, ?, ?, ?)";
+    const [result] = await connection.execute(sql, [
+      username,
+      password,
+      phoneNumber,
+      roleType,
+    ]);
+    return result;
+  }
 }
 
 module.exports = new UserService();

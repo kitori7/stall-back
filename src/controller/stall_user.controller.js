@@ -1,0 +1,43 @@
+const StallUserService = require("../service/stall_user.service");
+const jwt = require("jsonwebtoken");
+const { PRIVATE_KEY } = require("../config/secret");
+
+class StallUserController {
+  async register(ctx) {
+    const { username, password, phoneNumber, roleType } = ctx.request.body;
+    await StallUserService.createUser({
+      username,
+      password,
+      phoneNumber,
+      roleType,
+    });
+    ctx.app.emit("success", ctx, true, "注册成功");
+  }
+
+  async login(ctx) {
+    // 颁发令牌
+    const { id, username } = ctx.user;
+    const token = jwt.sign({ id, username }, PRIVATE_KEY, {
+      expiresIn: "1d",
+      algorithm: "RS256",
+    });
+    const user = await StallUserService.getUserByUserName(username);
+    ctx.app.emit(
+      "success",
+      ctx,
+      {
+        userInfo: {
+          id: user[0].id,
+          avatar: user[0].avatar,
+          username: user[0].username,
+          phoneNumber: user[0].phone_number,
+          roleType: user[0].role_type,
+        },
+        token,
+      },
+      "登录成功"
+    );
+  }
+}
+
+module.exports = new StallUserController();
