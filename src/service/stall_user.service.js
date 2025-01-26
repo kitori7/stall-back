@@ -1,9 +1,8 @@
 const connection = require("../app/database");
 
 class StallUserService {
-  async createUser(user) {
+  async createUser(username, password, phoneNumber, roleType) {
     try {
-      const { username, password, phoneNumber, roleType } = user;
       const sql = `
       INSERT INTO stall_user (username, password, phone_number, role_type)
       VALUES (?, ?, ?, ?)

@@ -2,12 +2,10 @@ const connection = require("../app/database");
 
 class StallService {
   async createStall(
-    userName,
-    password,
-    phoneNumber,
+    userId,
     stallName,
     ownerName,
-    ownerId,
+    ownerIdCard,
     ownerPhoneNumber,
     stallHeadImg,
     stallDetailImg,
@@ -16,7 +14,8 @@ class StallService {
     foodSafetyImg,
     individualImg
   ) {
-    const sql = `
+    try {
+      const sql = `
       INSERT INTO stall (
         user_id,
         stall_name,
@@ -32,20 +31,23 @@ class StallService {
         status
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '0')
     `;
-    const [result] = await connection.execute(sql, [
-      userName,
-      stallName,
-      ownerName,
-      ownerId,
-      ownerPhoneNumber,
-      stallHeadImg,
-      JSON.stringify(stallDetailImg),
-      stallDesc,
-      businessImg,
-      foodSafetyImg,
-      individualImg,
-    ]);
-    return result;
+      const [result] = await connection.execute(sql, [
+        userId,
+        stallName,
+        ownerName,
+        ownerIdCard,
+        ownerPhoneNumber,
+        stallHeadImg,
+        stallDetailImg,
+        stallDesc,
+        businessImg,
+        foodSafetyImg,
+        individualImg,
+      ]);
+      return result;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async updateStall(id, stallData) {
