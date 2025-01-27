@@ -6,6 +6,7 @@ const ERROR_TYPE = {
   UNAUTHORIZED: "unauthorized",
   SERVER_ERROR: "server_error",
   ROLE_EXIST: "role_exist",
+  USER_STATUS_NOT_PASSED: "user_status_not_passed",
 };
 
 module.exports = ERROR_TYPE;

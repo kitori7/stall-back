@@ -4,6 +4,7 @@ const md5password = require("../utils/md5-password");
 const jwt = require("jsonwebtoken");
 const { PUBLIC_KEY } = require("../config/secret");
 const StallUserService = require("../service/stall_user.service");
+const stallService = require("../service/stall.service");
 const verifyUser = (type) => {
   return async (ctx, next) => {
     const { username, password } = ctx.request.body;
@@ -103,12 +104,32 @@ const verifyStallUser = (type) => {
 };
 
 const verifyStallUserLogin = async (ctx, next) => {
-  const { username, password } = ctx.request.body;
-  const user = await StallUserService.getUserByUserName(username);
-  if (user[0].password !== md5password(password)) {
-    return ctx.app.emit("error", ERROR_TYPE.PASSWORD_IS_INCORRECT, ctx);
+  try {
+    const { username, password } = ctx.request.body;
+    const user = await StallUserService.getUserByUserName(username);
+    if (user[0].password !== md5password(password)) {
+      return ctx.app.emit("error", ERROR_TYPE.PASSWORD_IS_INCORRECT, ctx);
+    }
+    ctx.user = user[0];
+    await next();
+  } catch (error) {
+    return ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);
   }
-  ctx.user = user[0];
+};
+
+// 判断用户的stall 是否状态为已通过
+const verifyStallUserStatus = async (ctx, next) => {
+  console.log(ctx.user);
+
+  const { id, role_type } = ctx.user;
+  // 如果用户是摊主, 则需要判断摊位状态
+  if (role_type === "1") {
+    const stateInfo = await stallService.getStallState(id);
+    if (stateInfo.status !== "1") {
+      return ctx.app.emit("error", ERROR_TYPE.USER_STATUS_NOT_PASSED, ctx);
+    }
+  }
+
   await next();
 };
 
@@ -119,4 +140,5 @@ module.exports = {
   verifyAuth,
   verifyStallUser,
   verifyStallUserLogin,
+  verifyStallUserStatus,
 };

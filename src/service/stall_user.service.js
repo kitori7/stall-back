@@ -26,6 +26,14 @@ class StallUserService {
     const [result] = await connection.execute(sql, [userName]);
     return result;
   }
+
+  async getUserById(id) {
+    const sql = `
+        SELECT username,phone_number phoneNumber,role_type roleType ,avatar FROM stall_user WHERE id = ?
+      `;
+    const [result] = await connection.execute(sql, [id]);
+    return result[0];
+  }
 }
 
 module.exports = new StallUserService();

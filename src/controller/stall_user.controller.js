@@ -38,6 +38,12 @@ class StallUserController {
       "登录成功"
     );
   }
+
+  async detail(ctx) {
+    const { id } = ctx.params;
+    const result = await StallUserService.getUserById(id);
+    ctx.app.emit("success", ctx, result);
+  }
 }
 
 module.exports = new StallUserController();

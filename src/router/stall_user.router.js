@@ -4,6 +4,7 @@ const {
   handlePassword,
   verifyStallUser,
   verifyStallUserLogin,
+  verifyStallUserStatus,
 } = require("../middleware/user.middleware");
 const stallUserRouter = new KoaRouter({
   prefix: "/stall/user",
@@ -22,7 +23,11 @@ stallUserRouter.post(
   "/login",
   verifyStallUser("LOGIN"),
   verifyStallUserLogin,
+  verifyStallUserStatus,
   stallUserController.login
 );
+
+// 获取摊位用户信息
+stallUserRouter.get("/:id", stallUserController.detail);
 
 module.exports = stallUserRouter;

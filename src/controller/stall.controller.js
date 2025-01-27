@@ -29,7 +29,6 @@ const create = async (ctx) => {
       phoneNumber,
       "1"
     );
-    console.log(user.insertId);
 
     // 第二步：创建摊位
     const stall = await StallService.createStall(
@@ -60,7 +59,15 @@ const create = async (ctx) => {
     // 第四步：创建记录表
     await StallRecordService.createRecord(stall.insertId, "0");
 
-    ctx.app.emit("success", ctx, stall.insertId, "摊位创建成功");
+    ctx.app.emit(
+      "success",
+      ctx,
+      {
+        stallId: stall.insertId,
+        userId: user.insertId,
+      },
+      "摊位创建成功"
+    );
   } catch (error) {
     ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR);
   }
@@ -77,12 +84,9 @@ const timeline = async (ctx) => {
 const update = async (ctx) => {
   const { id } = ctx.params;
   const {
-    userName,
-    password,
-    phoneNumber,
     stallName,
     ownerName,
-    ownerId,
+    ownerIdCard,
     ownerPhoneNumber,
     stallHeadImg,
     stallDetailImg,
@@ -90,26 +94,50 @@ const update = async (ctx) => {
     businessImg,
     foodSafetyImg,
     individualImg,
+    employees,
   } = ctx.request.body;
   try {
-    const result = await StallService.updateStall(
-      id,
-      userName,
-      password,
-      phoneNumber,
+    const result = await StallService.updateStall(id, {
       stallName,
       ownerName,
-      ownerId,
+      ownerIdCard,
       ownerPhoneNumber,
       stallHeadImg,
       stallDetailImg,
       stallDesc,
       businessImg,
       foodSafetyImg,
-      individualImg
-    );
+      individualImg,
+      status: "0", //状态重置为待审核
+    });
+
+    // 更新员工信息
+    if (employees && employees.length > 0) {
+      await Promise.all(
+        employees.map(async (employee) => {
+          const {
+            id: employeeId,
+            name,
+            phoneNumber,
+            idCard,
+            healthImg,
+          } = employee;
+          await EmployeeService.updateEmployee(employeeId, {
+            name,
+            phoneNumber,
+            idCard,
+            healthImg,
+            stallId: id,
+          });
+        })
+      );
+    }
+
+    // 创建摊位记录
+    await StallRecordService.createRecord(id, "0");
     ctx.app.emit("success", ctx, result);
   } catch (error) {
+    console.error(error);
     ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);
   }
 };
@@ -128,11 +156,48 @@ const detail = async (ctx) => {
 // 获取摊位列表
 const list = async (ctx) => {
   try {
-    const result = await StallService.getStallList();
-    ctx.app.emit("success", ctx, result);
+    const {
+      current = 1,
+      pageSize = 10,
+      stallName,
+      ownerName,
+      ownerPhoneNumber,
+      status,
+    } = ctx.request.body;
+    const offset = (current - 1) * pageSize;
+    const result = await StallService.getAllStalls(
+      offset,
+      pageSize,
+      stallName,
+      ownerName,
+      ownerPhoneNumber,
+      status
+    );
+    ctx.app.emit("list", ctx, result, result.length);
   } catch (error) {
     ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);
   }
+};
+
+// 摊位审核通过
+const audit = async (ctx) => {
+  const { id } = ctx.params;
+  // 修改摊位状态为通过
+  await StallService.editStallStatus(id, "1");
+  // 创建摊位记录
+  await StallRecordService.createRecord(id, "1");
+  ctx.app.emit("success", ctx, true, "摊位审核通过");
+};
+
+// 摊位审核驳回
+const reject = async (ctx) => {
+  const { id } = ctx.params;
+  const { reason } = ctx.request.body;
+  // 修改摊位状态为2
+  await StallService.editStallStatus(id, "2");
+  // 创建摊位记录
+  await StallRecordService.createRecord(id, "2", reason);
+  ctx.app.emit("success", ctx, true, "摊位审核驳回");
 };
 
 module.exports = {
@@ -141,4 +206,6 @@ module.exports = {
   detail,
   list,
   timeline,
+  audit,
+  reject,
 };

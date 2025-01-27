@@ -26,10 +26,10 @@ class EmployeeService {
 
   // 更新员工信息
   async updateEmployee(id, employee) {
-    const { name, phoneNumber, idCard, healthImg, stallId } = employee;
+    const { name, phoneNumber, idCard, healthImg } = employee;
     const sql = `
       UPDATE stall_employees
-      SET name = ?, phone_number = ?, id_number = ?, health_certificate = ?, stall_id = ?
+      SET name = ?, phone_number = ?, id_number = ?, health_certificate = ?
       WHERE id = ?
     `;
     const [result] = await connection.execute(sql, [
@@ -37,7 +37,6 @@ class EmployeeService {
       phoneNumber,
       idCard,
       healthImg,
-      stallId,
       id,
     ]);
     return result;

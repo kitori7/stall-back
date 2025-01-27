@@ -34,6 +34,10 @@ app.on("error", (error, ctx) => {
       code = -1007;
       message = "角色已存在";
       break;
+    case ERROR_TYPE.USER_STATUS_NOT_PASSED:
+      code = -1008;
+      message = "摊位状态审核未通过或已驳回";
+      break;
     default:
       code = -1000;
       message = "未知错误";
