@@ -38,6 +38,10 @@ app.on("error", (error, ctx) => {
       code = -1008;
       message = "摊位状态审核未通过或已驳回";
       break;
+    case ERROR_TYPE.STALL_STATUS_DISABLE:
+      code = -1009;
+      message = "摊位已禁用,请联系管理员";
+      break;
     default:
       code = -1000;
       message = "未知错误";

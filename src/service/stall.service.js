@@ -176,8 +176,15 @@ class StallService {
         params.push(status);
       }
 
-      // 添加排序条件，status为0的排在前面
-      sql += " ORDER BY CASE WHEN s.status = '0' THEN 0 ELSE 1 END";
+      // 添加排序条件：待审核(0) > 已驳回(2) > 已通过(1) > 已禁用(3)
+      sql += ` ORDER BY 
+        CASE 
+          WHEN s.status = '0' THEN 0
+          WHEN s.status = '2' THEN 1
+          WHEN s.status = '1' THEN 2
+          WHEN s.status = '3' THEN 3
+          ELSE 4
+        END`;
 
       if (offset && pageSize) {
         sql += " LIMIT ?, ?";

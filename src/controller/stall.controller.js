@@ -200,6 +200,13 @@ const reject = async (ctx) => {
   ctx.app.emit("success", ctx, true, "摊位审核驳回");
 };
 
+// 禁用摊位
+const disable = async (ctx) => {
+  const { id } = ctx.params;
+  await StallService.editStallStatus(id, "3");
+  ctx.app.emit("success", ctx, true, "禁用成功");
+};
+
 module.exports = {
   create,
   update,
@@ -208,4 +215,5 @@ module.exports = {
   timeline,
   audit,
   reject,
+  disable,
 };

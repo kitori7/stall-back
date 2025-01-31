@@ -7,6 +7,7 @@ const ERROR_TYPE = {
   SERVER_ERROR: "server_error",
   ROLE_EXIST: "role_exist",
   USER_STATUS_NOT_PASSED: "user_status_not_passed",
+  STALL_STATUS_DISABLE: "stall_status_disable",
 };
 
 module.exports = ERROR_TYPE;

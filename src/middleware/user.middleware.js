@@ -125,6 +125,9 @@ const verifyStallUserStatus = async (ctx, next) => {
   // 如果用户是摊主, 则需要判断摊位状态
   if (role_type === "1") {
     const stateInfo = await stallService.getStallState(id);
+    if (stateInfo.status === "3") {
+      return ctx.app.emit("error", ERROR_TYPE.STALL_STATUS_DISABLE, ctx);
+    }
     if (stateInfo.status !== "1") {
       return ctx.app.emit("error", ERROR_TYPE.USER_STATUS_NOT_PASSED, ctx);
     }

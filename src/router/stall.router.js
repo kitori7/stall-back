@@ -7,6 +7,7 @@ const {
   timeline,
   audit,
   reject,
+  disable,
 } = require("../controller/stall.controller");
 const { verifyAuth, handlePassword } = require("../middleware/user.middleware");
 
@@ -29,6 +30,8 @@ stallRouter.post("/list", verifyAuth, list);
 // 获取审核时间线
 stallRouter.get("/timeline/:id", timeline);
 
+// 禁用摊位
+stallRouter.post("/disable/:id", disable);
 // 摊位审核通过
 stallRouter.post("/audit/:id", audit);
 
