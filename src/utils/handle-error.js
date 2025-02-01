@@ -42,6 +42,10 @@ app.on("error", (error, ctx) => {
       code = -1009;
       message = "摊位已禁用,请联系管理员";
       break;
+    case ERROR_TYPE.LOCATION_NAME_ALREADY_EXISTS:
+      code = -1010;
+      message = "位置名称已存在";
+      break;
     default:
       code = -1000;
       message = "未知错误";

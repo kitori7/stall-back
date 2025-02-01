@@ -8,6 +8,7 @@ const ERROR_TYPE = {
   ROLE_EXIST: "role_exist",
   USER_STATUS_NOT_PASSED: "user_status_not_passed",
   STALL_STATUS_DISABLE: "stall_status_disable",
+  LOCATION_NAME_ALREADY_EXISTS: "location_name_already_exists",
 };
 
 module.exports = ERROR_TYPE;
