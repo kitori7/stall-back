@@ -48,7 +48,6 @@ class LocationController {
 
   async list(ctx) {
     const { current = 1, pageSize = 10, locationName } = ctx.request.body;
-    console.log(current, pageSize, locationName);
     const offset = (current - 1) * pageSize;
     const locations = await LocationService.list(
       offset,
