@@ -120,8 +120,6 @@ const verifyStallUserLogin = async (ctx, next) => {
 
 // 判断用户的stall 是否状态为已通过
 const verifyStallUserStatus = async (ctx, next) => {
-  console.log(ctx.user);
-
   const { id, role_type } = ctx.user;
   // 如果用户是摊主, 则需要判断摊位状态
   if (role_type === "1") {

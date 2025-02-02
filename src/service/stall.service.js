@@ -133,6 +133,14 @@ class StallService {
     return result[0];
   }
 
+  async getStallByUserId(userId) {
+    const sql = `
+      SELECT * FROM stall WHERE user_id = ?
+    `;
+    const [result] = await connection.execute(sql, [userId]);
+    return result[0];
+  }
+
   async getAllStalls(
     offset,
     pageSize,

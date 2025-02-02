@@ -1,6 +1,7 @@
 const StallUserService = require("../service/stall_user.service");
 const jwt = require("jsonwebtoken");
 const { PRIVATE_KEY } = require("../config/secret");
+const StallService = require("../service/stall.service");
 
 class StallUserController {
   async register(ctx) {
@@ -22,6 +23,8 @@ class StallUserController {
       algorithm: "RS256",
     });
     const user = await StallUserService.getUserByUserName(username);
+    const stall = await StallService.getStallByUserId(id);
+    console.log(stall);
     ctx.app.emit(
       "success",
       ctx,
@@ -32,6 +35,7 @@ class StallUserController {
           username: user[0].username,
           phoneNumber: user[0].phone_number,
           roleType: user[0].role_type,
+          stallId: stall ? stall.id : null,
         },
         token,
       },
