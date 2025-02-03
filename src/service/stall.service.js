@@ -211,6 +211,41 @@ class StallService {
     const [result] = await connection.execute(sql, [status, id]);
     return result;
   }
+
+  async getMobileStallList(offset, pageSize, stallName) {
+    console.log(offset, pageSize, stallName);
+
+    let sql = `
+      SELECT 
+        s.id,
+        s.stall_name AS stallName,
+        s.stall_description AS stallDesc,
+        s.stall_head_image AS stallHeadImg,
+        s.status,
+        JSON_ARRAYAGG(r.time) AS times
+      FROM stall s
+      LEFT JOIN reservation r ON s.id = r.stall_id
+      WHERE s.status = "1"
+      AND r.date = (SELECT MIN(date) FROM reservation WHERE date >= CURDATE())
+    `;
+    const params = [];
+    if (stallName) {
+      sql += ` AND s.stall_name LIKE ?`;
+      params.push(`%${stallName}%`);
+    }
+    sql += ` GROUP BY s.id`;
+    if (offset && pageSize) {
+      sql += ` LIMIT ?, ?`;
+      params.push(Number(offset), Number(pageSize));
+    }
+    try {
+      const [result] = await connection.execute(sql, params);
+      return result;
+    } catch (error) {
+      console.error("获取移动端摊位列表失败:", error);
+      return [];
+    }
+  }
 }
 
 module.exports = new StallService();

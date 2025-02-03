@@ -8,6 +8,7 @@ const {
   audit,
   reject,
   disable,
+  mobileList,
 } = require("../controller/stall.controller");
 const { verifyAuth, handlePassword } = require("../middleware/user.middleware");
 
@@ -37,5 +38,8 @@ stallRouter.post("/audit/:id", audit);
 
 // 摊位审核驳回
 stallRouter.post("/reject/:id", reject);
+
+// 移动端获取摊位列表
+stallRouter.post("/mobile/list", verifyAuth, mobileList);
 
 module.exports = stallRouter;

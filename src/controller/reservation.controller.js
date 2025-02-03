@@ -25,6 +25,23 @@ class ReservationController {
     const data = reservationTime.map((item) => item.time);
     ctx.app.emit("success", ctx, data);
   }
+
+  // 根据摊位 id 获取预约列表
+  async getReservationListByStallId(ctx) {
+    const { stallId } = ctx.request.query;
+    const reservationList =
+      await ReservationService.getReservationListByStallId(stallId);
+    ctx.app.emit("list", ctx, reservationList, reservationList.length);
+  }
+
+  // 删除预约
+  async remove(ctx) {
+    const { ids } = ctx.request.body;
+    for (const id of ids) {
+      await ReservationService.remove(id);
+    }
+    ctx.app.emit("success", ctx, true, "预约删除成功");
+  }
 }
 
 module.exports = new ReservationController();

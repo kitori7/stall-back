@@ -207,6 +207,20 @@ const disable = async (ctx) => {
   ctx.app.emit("success", ctx, true, "禁用成功");
 };
 
+// 移动端获取摊位列表
+const mobileList = async (ctx) => {
+  const { current = 1, pageSize = 10, stallName } = ctx.request.body;
+  const offset = (current - 1) * pageSize;
+  const result = await StallService.getMobileStallList(
+    offset,
+    pageSize,
+    stallName
+  );
+  console.log(result);
+
+  ctx.app.emit("list", ctx, result, result.length);
+};
+
 module.exports = {
   create,
   update,
@@ -216,4 +230,5 @@ module.exports = {
   audit,
   reject,
   disable,
+  mobileList,
 };
