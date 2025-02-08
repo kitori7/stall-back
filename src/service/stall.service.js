@@ -102,6 +102,8 @@ class StallService {
         stall.business_license AS businessImg,
         stall.food_safety_license AS foodSafetyImg,
         stall.individual_business_license AS individualImg,
+        stall.average_rating AS averageRating,
+        stall.total_ratings AS totalRatings,
         JSON_ARRAYAGG(
           JSON_OBJECT(
             'id', se.id,
@@ -213,8 +215,6 @@ class StallService {
   }
 
   async getMobileStallList(offset, pageSize, stallName) {
-    console.log(offset, pageSize, stallName);
-
     let sql = `
       SELECT 
         s.id,
@@ -222,11 +222,13 @@ class StallService {
         s.stall_description AS stallDesc,
         s.stall_head_image AS stallHeadImg,
         s.status,
-        JSON_ARRAYAGG(r.time) AS times
+        CASE
+          WHEN r.time IS NULL THEN JSON_ARRAY()
+          ELSE IFNULL(JSON_ARRAYAGG(r.time), JSON_ARRAY())
+        END AS times
       FROM stall s
       LEFT JOIN reservation r ON s.id = r.stall_id
-      WHERE s.status = "1"
-      AND r.date = (SELECT MIN(date) FROM reservation WHERE date >= CURDATE())
+      WHERE s.status = '1'
     `;
     const params = [];
     if (stallName) {
@@ -234,6 +236,7 @@ class StallService {
       params.push(`%${stallName}%`);
     }
     sql += ` GROUP BY s.id`;
+    sql += ` ORDER BY ABS(DATEDIFF(r.date, CURDATE()))`;
     if (offset && pageSize) {
       sql += ` LIMIT ?, ?`;
       params.push(Number(offset), Number(pageSize));
@@ -245,6 +248,17 @@ class StallService {
       console.error("获取移动端摊位列表失败:", error);
       return [];
     }
+  }
+
+  // 更新摊位平均分
+  async updateStallAverageScore(stallId) {
+    const sql = `UPDATE stall 
+      SET 
+        total_ratings = (SELECT COUNT(*) FROM stall_comment WHERE stall_id = ?),
+        average_rating = (SELECT AVG(rating) FROM stall_comment WHERE stall_id = ?)
+      WHERE id = ?;`;
+    const [result] = await connection.execute(sql, [stallId, stallId, stallId]);
+    return result;
   }
 }
 
