@@ -104,6 +104,15 @@ class StallService {
         stall.individual_business_license AS individualImg,
         stall.average_rating AS averageRating,
         stall.total_ratings AS totalRatings,
+        (SELECT JSON_OBJECT(
+            'reservationId', r.id,
+            'times', r.times,
+            'date', r.date
+         ) 
+         FROM reservation r 
+         WHERE r.stall_id = stall.id 
+         ORDER BY ABS(DATEDIFF(r.date, CURDATE())) 
+         LIMIT 1) AS reservationInfo,
         JSON_ARRAYAGG(
           JSON_OBJECT(
             'id', se.id,
@@ -222,10 +231,7 @@ class StallService {
         s.stall_description AS stallDesc,
         s.stall_head_image AS stallHeadImg,
         s.status,
-        CASE
-          WHEN r.time IS NULL THEN JSON_ARRAY()
-          ELSE IFNULL(JSON_ARRAYAGG(r.time), JSON_ARRAY())
-        END AS times
+        r.times
       FROM stall s
       LEFT JOIN reservation r ON s.id = r.stall_id
       WHERE s.status = '1'

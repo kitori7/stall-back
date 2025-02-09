@@ -5,7 +5,6 @@ class CommentController {
   async create(ctx) {
     try {
       const { userId, stallId, content, rating } = ctx.request.body;
-      console.log(userId, stallId, content, rating);
       await CommentService.createComment(userId, stallId, content, rating);
       // 更新摊位平均分
       await StallService.updateStallAverageScore(stallId);

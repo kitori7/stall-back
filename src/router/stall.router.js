@@ -40,6 +40,6 @@ stallRouter.post("/audit/:id", audit);
 stallRouter.post("/reject/:id", reject);
 
 // 移动端获取摊位列表
-stallRouter.post("/mobile/list", verifyAuth, mobileList);
+stallRouter.post("/mobile/list", mobileList);
 
 module.exports = stallRouter;

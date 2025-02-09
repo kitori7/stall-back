@@ -1,13 +1,13 @@
 const connection = require("../app/database");
 
 class CommentService {
-  async createComment(userId, stallId, content, rating) {
+  async createComment(userId = 0, stallId, content, rating) {
     const sql = `INSERT INTO stall_comment (user_id, stall_id, content, rating) VALUES (?, ?, ?, ?)`;
     const [result] = await connection.execute(sql, [
       userId,
       stallId,
       content,
-      rating,
+      rating || null, // 如果 rating 为空则插入 null
     ]);
     return result;
   }
@@ -15,7 +15,7 @@ class CommentService {
   async getCommentsByStallId(stallId, offset, pageSize) {
     console.log(stallId, offset, pageSize);
     let sql = `SELECT sc.id, sc.content, sc.rating, sc.created_at createdAt,
-    su.username, su.role_type roleType
+    su.username, su.role_type roleType, su.avatar
     FROM stall_comment sc
     LEFT JOIN stall_user su ON sc.user_id = su.id
     WHERE sc.stall_id = ?`;

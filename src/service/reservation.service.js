@@ -1,11 +1,11 @@
 const connection = require("../app/database");
 
 class ReservationService {
-  async create(date, time, locationId, stallId) {
-    const sql = `INSERT INTO reservation (date, time, location_id, stall_id) VALUES (?, ?, ?, ?)`;
+  async create(date, times, locationId, stallId) {
+    const sql = `INSERT INTO reservation (date, times, location_id, stall_id) VALUES (?, ?, ?, ?)`;
     const [result] = await connection.execute(sql, [
       date,
-      time,
+      JSON.stringify(times),
       locationId,
       stallId,
     ]);
@@ -14,18 +14,21 @@ class ReservationService {
 
   // 获取当天预约时段
   async getReservationTime(date, locationId) {
-    const sql = `SELECT time FROM reservation WHERE date = ? AND location_id = ?`;
+    const sql = `SELECT times FROM reservation WHERE date = ? AND location_id = ?`;
     const [result] = await connection.execute(sql, [date, locationId]);
-    return result;
+    if (result.length === 0) {
+      return [];
+    }
+    return result[0].times;
   }
 
   // 根据摊位 id 获取预约列表
   async getReservationListByStallId(stallId) {
     const sql = `
       SELECT
-        JSON_ARRAYAGG(r.id) AS ids,
+        r.id,
         r.date,
-        JSON_ARRAYAGG(r.time) AS times,
+        r.times,
         l.location_name AS locationName,
         r.created_at AS createdAt
       FROM reservation r

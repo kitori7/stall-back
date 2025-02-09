@@ -6,9 +6,8 @@ class ReservationController {
   async create(ctx) {
     try {
       const { date, times, locationId, stallId } = ctx.request.body;
-      times.forEach(async (time) => {
-        await ReservationService.create(date, time, locationId, stallId);
-      });
+      await ReservationService.create(date, times, locationId, stallId);
+
       ctx.app.emit("success", ctx, true, "预约创建成功");
     } catch (error) {
       ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);
@@ -22,8 +21,7 @@ class ReservationController {
       date,
       locationId
     );
-    const data = reservationTime.map((item) => item.time);
-    ctx.app.emit("success", ctx, data);
+    ctx.app.emit("success", ctx, reservationTime);
   }
 
   // 根据摊位 id 获取预约列表
@@ -36,10 +34,8 @@ class ReservationController {
 
   // 删除预约
   async remove(ctx) {
-    const { ids } = ctx.request.body;
-    for (const id of ids) {
-      await ReservationService.remove(id);
-    }
+    const { id } = ctx.request.body;
+    await ReservationService.remove(id);
     ctx.app.emit("success", ctx, true, "预约删除成功");
   }
 }
