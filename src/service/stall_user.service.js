@@ -34,6 +34,12 @@ class StallUserService {
     const [result] = await connection.execute(sql, [id]);
     return result[0];
   }
+
+  async getUserTotal() {
+    const sql = `SELECT COUNT(*) FROM stall_user`;
+    const [result] = await connection.execute(sql);
+    return result[0]["COUNT(*)"];
+  }
 }
 
 module.exports = new StallUserService();

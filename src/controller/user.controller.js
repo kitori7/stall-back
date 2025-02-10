@@ -11,7 +11,7 @@ class UserController {
     // 颁发令牌
     const { id, username } = ctx.user;
     const token = jwt.sign({ id, username }, PRIVATE_KEY, {
-      expiresIn: "1h",
+      expiresIn: "1d",
       algorithm: "RS256",
     });
     const res = await UserService.getUserById(id);

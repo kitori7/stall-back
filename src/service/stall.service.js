@@ -231,7 +231,10 @@ class StallService {
         s.stall_description AS stallDesc,
         s.stall_head_image AS stallHeadImg,
         s.status,
-        r.times
+        s.average_rating AS averageRating,
+        r.times,
+        r.date,
+        (SELECT l.coordinates FROM location l WHERE l.id = r.location_id) AS coordinates
       FROM stall s
       LEFT JOIN reservation r ON s.id = r.stall_id
       WHERE s.status = '1'
@@ -265,6 +268,29 @@ class StallService {
       WHERE id = ?;`;
     const [result] = await connection.execute(sql, [stallId, stallId, stallId]);
     return result;
+  }
+
+  // 更新总营收
+  async updateTotalRevenue(stallId) {
+    const sql = `UPDATE stall 
+      SET total_revenue = (SELECT SUM(amount) FROM stall_payment WHERE stall_id = ?)
+      WHERE id = ?;`;
+    const [result] = await connection.execute(sql, [stallId, stallId]);
+    return result;
+  }
+  // 更新总访问量
+  async updateTotalVisit(stallId) {
+    const sql = `UPDATE stall 
+      SET total_visits = (SELECT COUNT(*) FROM stall_visit WHERE stall_id = ?)
+      WHERE id = ?;`;
+    const [result] = await connection.execute(sql, [stallId, stallId]);
+    return result;
+  }
+
+  async getStallTotal() {
+    const sql = `SELECT COUNT(*) FROM stall`;
+    const [result] = await connection.execute(sql);
+    return result[0]["COUNT(*)"];
   }
 }
 
