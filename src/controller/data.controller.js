@@ -34,6 +34,32 @@ class DataController {
       ctx.app.emit("error", ctx, ERROR_TYPE.SERVER_ERROR);
     }
   }
+
+  async getMobileData(ctx) {
+    try {
+      const { stallId } = ctx.params;
+      // 获取摊位信息
+      const stallInfo = await stallService.getStallDetail(stallId);
+      // 获取摊位访问量
+      const visit = await visitService.getStallVisitTotal(stallId);
+      // 获取摊位流水
+      const payment = await paymentService.getStallPaymentTotal(stallId);
+      // 获取摊位总订单数
+      const order = await paymentService.getStallOrderTotal(stallId);
+      // 获取摊位折线图数据
+      const paymentLine = await paymentService.getStallPaymentLine(stallId);
+      ctx.app.emit("success", ctx, {
+        stallInfo,
+        visit,
+        payment: Number(payment),
+        order,
+        paymentLine,
+      });
+    } catch (error) {
+      console.log(error);
+      ctx.app.emit("error", ctx, ERROR_TYPE.SERVER_ERROR);
+    }
+  }
 }
 
 module.exports = new DataController();

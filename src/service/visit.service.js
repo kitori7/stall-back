@@ -50,6 +50,13 @@ class VisitService {
     const [result] = await connection.execute(sql);
     return result;
   }
+
+  // 获取摊位访问量
+  async getStallVisitTotal(stallId) {
+    const sql = `SELECT COUNT(*) FROM stall_visit WHERE stall_id = ?`;
+    const [result] = await connection.execute(sql, [stallId]);
+    return result[0]["COUNT(*)"];
+  }
 }
 
 module.exports = new VisitService();

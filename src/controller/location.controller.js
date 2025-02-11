@@ -62,6 +62,17 @@ class LocationController {
     await LocationService.remove(id);
     ctx.app.emit("success", ctx, true, "删除位置成功");
   }
+
+  async reservation(ctx) {
+    try {
+      const { id } = ctx.params;
+      const reservation = await LocationService.getReservation(id);
+      ctx.app.emit("success", ctx, reservation);
+    } catch (error) {
+      console.log(error);
+      ctx.app.emit("error", ctx, ERROR_TYPE.SERVER_ERROR);
+    }
+  }
 }
 
 module.exports = new LocationController();
