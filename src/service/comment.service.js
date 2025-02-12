@@ -13,20 +13,20 @@ class CommentService {
   }
 
   async getCommentsByStallId(stallId, offset, pageSize) {
-    console.log(stallId, offset, pageSize);
     let sql = `SELECT sc.id, sc.content, sc.rating, sc.created_at createdAt,
     su.username, su.role_type roleType, su.avatar
     FROM stall_comment sc
     LEFT JOIN stall_user su ON sc.user_id = su.id
-    WHERE sc.stall_id = ?`;
-    const params = [stallId];
+  `;
+    const params = [];
 
-    // 如果 offset 和 pageSize 都有值，则添加分页限制
-    if (offset && pageSize) {
-      sql += " LIMIT ?, ?";
-      params.push(Number(offset), Number(pageSize));
+    // 确保 stallId 是有效的
+    if (stallId !== undefined && stallId !== null) {
+      sql += " WHERE sc.stall_id = ?";
+      params.push(Number(stallId)); // 确保它是数字类型
     }
 
+    // 执行 SQL 查询
     const [result] = await connection.execute(sql, params);
     return result;
   }

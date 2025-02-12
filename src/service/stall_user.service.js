@@ -40,6 +40,12 @@ class StallUserService {
     const [result] = await connection.execute(sql);
     return result[0]["COUNT(*)"];
   }
+
+  async updateAvatar(id, avatar) {
+    const sql = "UPDATE stall_user SET avatar = ? WHERE id = ?";
+    const [result] = await connection.execute(sql, [avatar, id]);
+    return result;
+  }
 }
 
 module.exports = new StallUserService();

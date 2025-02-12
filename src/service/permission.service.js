@@ -3,8 +3,6 @@ const connection = require("../app/database");
 class PermissionService {
   // 创建权限
   async create(name, code) {
-    console.log(name, code);
-
     const statement = `INSERT INTO admin_permissions (permission_name, permission_code) VALUES (?, ?);`;
     const [result] = await connection.execute(statement, [name, code]);
     return result;

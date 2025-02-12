@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const UserService = require("../service/user.service");
 const { PRIVATE_KEY } = require("../config/secret");
+const ERROR_TYPE = require("../config/error");
 class UserController {
   async create(ctx) {
     await UserService.create(ctx.request.body);

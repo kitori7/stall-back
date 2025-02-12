@@ -4,8 +4,6 @@ class EmployeeService {
   // 创建员工
   async createEmployee(name, phoneNumber, idCard, healthImg, stallId) {
     try {
-      console.log(name, phoneNumber, idCard, healthImg, stallId);
-
       const sql = `
       INSERT INTO stall_employees
       (name, phone_number, id_number, health_certificate, stall_id) 

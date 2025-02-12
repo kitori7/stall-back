@@ -24,7 +24,6 @@ class StallUserController {
     });
     const user = await StallUserService.getUserByUserName(username);
     const stall = await StallService.getStallByUserId(id);
-    console.log(stall);
     ctx.app.emit(
       "success",
       ctx,
@@ -47,6 +46,19 @@ class StallUserController {
     const { id } = ctx.params;
     const result = await StallUserService.getUserById(id);
     ctx.app.emit("success", ctx, result);
+  }
+
+  async updateAvatar(ctx) {
+    try {
+      const { id } = ctx.params;
+      const { avatar } = ctx.request.body;
+      console.log(avatar);
+      await StallUserService.updateAvatar(id, avatar);
+      ctx.app.emit("success", ctx, true, "更新用户头像成功");
+    } catch (error) {
+      console.log(error);
+      ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);
+    }
   }
 }
 

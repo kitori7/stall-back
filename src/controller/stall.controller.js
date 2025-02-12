@@ -209,14 +209,19 @@ const disable = async (ctx) => {
 
 // 移动端获取摊位列表
 const mobileList = async (ctx) => {
-  const { current = 1, pageSize = 10, stallName } = ctx.request.body;
+  const {
+    current = 1,
+    pageSize = 10,
+    stallName,
+    sortType = "0",
+  } = ctx.request.body;
   const offset = (current - 1) * pageSize;
   const result = await StallService.getMobileStallList(
     offset,
     pageSize,
-    stallName
+    stallName,
+    sortType
   );
-  console.log(result);
 
   ctx.app.emit("list", ctx, result, result.length);
 };

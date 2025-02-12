@@ -30,4 +30,7 @@ stallUserRouter.post(
 // 获取摊位用户信息
 stallUserRouter.get("/:id", stallUserController.detail);
 
+// 修改摊位用户头像
+stallUserRouter.patch("/avatar/:id", stallUserController.updateAvatar);
+
 module.exports = stallUserRouter;

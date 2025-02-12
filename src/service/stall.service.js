@@ -223,7 +223,7 @@ class StallService {
     return result;
   }
 
-  async getMobileStallList(offset, pageSize, stallName) {
+  async getMobileStallList(offset, pageSize, stallName, sortType) {
     let sql = `
       SELECT 
         s.id,
@@ -232,6 +232,8 @@ class StallService {
         s.stall_head_image AS stallHeadImg,
         s.status,
         s.average_rating AS averageRating,
+        s.total_revenue AS totalRevenue,
+        s.total_visits AS totalVisits,
         r.times,
         r.date,
         (SELECT l.coordinates FROM location l WHERE l.id = r.location_id) AS coordinates
@@ -245,7 +247,24 @@ class StallService {
       params.push(`%${stallName}%`);
     }
     sql += ` GROUP BY s.id`;
-    sql += ` ORDER BY ABS(DATEDIFF(r.date, CURDATE()))`;
+
+    let orderByClause = `ORDER BY ABS(DATEDIFF(r.date, CURDATE()))`;
+    switch (sortType) {
+      case "1":
+        orderByClause += `, CAST(s.average_rating AS DECIMAL) DESC`;
+        break;
+      case "2":
+        orderByClause += `, (SELECT COUNT(*) FROM reservation WHERE stall_id = s.id) DESC`;
+        break;
+      case "3":
+        orderByClause += `, s.total_visits DESC`;
+        break;
+      default:
+        break;
+    }
+
+    sql += ` ${orderByClause}`;
+
     if (offset && pageSize) {
       sql += ` LIMIT ?, ?`;
       params.push(Number(offset), Number(pageSize));
