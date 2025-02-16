@@ -88,6 +88,31 @@ class LocationService {
     LEFT JOIN stall s ON r.stall_id = s.id
     LEFT JOIN stall_visit sv ON r.id = sv.reservation_id
     LEFT JOIN stall_payment sp ON r.id = sp.reservation_id
+    WHERE l.id = ? ;
+    `;
+    const [result] = await connection.execute(statement, [id]);
+    return result[0];
+  }
+
+  // 根据位置id获取当前预约数据
+  async getReservationNow(id) {
+    const statement = `SELECT 
+    l.id locationId,
+    r.id reservationId,
+    s.stall_name stallName,
+    s.id stallId,
+    s.owner_phone_number ownerPhoneNumber,
+    s.owner_name ownerName,
+    l.location_name locationName,
+    r.times,
+    SUM(sp.amount) amount,
+    COUNT(sv.id) visitCount,
+    r.date date
+    FROM location l
+    LEFT JOIN reservation r ON l.id = r.location_id
+    LEFT JOIN stall s ON r.stall_id = s.id
+    LEFT JOIN stall_visit sv ON r.id = sv.reservation_id
+    LEFT JOIN stall_payment sp ON r.id = sp.reservation_id
     WHERE l.id = ? AND DATE(r.date) = CURDATE();
     `;
     const [result] = await connection.execute(statement, [id]);

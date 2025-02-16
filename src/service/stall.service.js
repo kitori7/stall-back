@@ -225,21 +225,29 @@ class StallService {
 
   async getMobileStallList(offset, pageSize, stallName, sortType) {
     let sql = `
-      SELECT 
-        s.id,
-        s.stall_name AS stallName,
-        s.stall_description AS stallDesc,
-        s.stall_head_image AS stallHeadImg,
-        s.status,
-        s.average_rating AS averageRating,
-        s.total_revenue AS totalRevenue,
-        s.total_visits AS totalVisits,
-        r.times,
-        r.date,
-        (SELECT l.coordinates FROM location l WHERE l.id = r.location_id) AS coordinates
-      FROM stall s
-      LEFT JOIN reservation r ON s.id = r.stall_id
-      WHERE s.status = '1'
+SELECT 
+    s.id,
+    s.stall_name AS stallName,
+    s.stall_description AS stallDesc,
+    s.stall_head_image AS stallHeadImg,
+    s.status,
+    s.average_rating AS averageRating,
+    s.total_revenue AS totalRevenue,
+    s.total_visits AS totalVisits,
+    r.times,
+    r.date,
+    (SELECT l.coordinates FROM location l WHERE l.id = r.location_id) AS coordinates
+FROM 
+    stall s
+LEFT JOIN 
+    reservation r ON s.id = r.stall_id
+WHERE 
+    s.status = '1' 
+    AND r.date = (
+        SELECT MAX(r2.date) 
+        FROM reservation r2 
+        WHERE r2.stall_id = s.id
+    )
     `;
     const params = [];
     if (stallName) {

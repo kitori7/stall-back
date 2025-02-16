@@ -73,6 +73,16 @@ class LocationController {
       ctx.app.emit("error", ctx, ERROR_TYPE.SERVER_ERROR);
     }
   }
+  async reservationNow(ctx) {
+    try {
+      const { id } = ctx.params;
+      const reservation = await LocationService.getReservationNow(id);
+      ctx.app.emit("success", ctx, reservation);
+    } catch (error) {
+      console.log(error);
+      ctx.app.emit("error", ctx, ERROR_TYPE.SERVER_ERROR);
+    }
+  }
 }
 
 module.exports = new LocationController();

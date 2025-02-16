@@ -6,6 +6,7 @@ const {
   detail,
   remove,
   reservation,
+  reservationNow,
 } = require("../controller/location.controller");
 const { verifyAuth } = require("../middleware/user.middleware");
 const locationRouter = new KoaRouter({
@@ -29,4 +30,7 @@ locationRouter.post("/list", verifyAuth, list);
 
 // 获取当前位置的预约数据
 locationRouter.get("/reservation/:id", verifyAuth, reservation);
+
+// 获取现在预约数据
+locationRouter.get("/reservation/now/:id", verifyAuth, reservationNow);
 module.exports = locationRouter;
