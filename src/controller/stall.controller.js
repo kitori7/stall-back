@@ -209,21 +209,81 @@ const disable = async (ctx) => {
 
 // 移动端获取摊位列表
 const mobileList = async (ctx) => {
-  const {
-    current = 1,
-    pageSize = 10,
-    stallName,
-    sortType = "0",
-  } = ctx.request.body;
-  const offset = (current - 1) * pageSize;
-  const result = await StallService.getMobileStallList(
-    offset,
-    pageSize,
-    stallName,
-    sortType
-  );
+  try {
+    const {
+      current = 1,
+      pageSize = 10,
+      stallName,
+      sortType = "0",
+    } = ctx.request.body;
+    const offset = (current - 1) * pageSize;
+    const result = await StallService.getMobileStallList(
+      offset,
+      pageSize,
+      stallName,
+      sortType
+    );
+    const now = new Date();
+    const newResult = result?.map((item) => {
+      const reservations = JSON.parse(item.reservations);
+      const lastCon = reservations.reduce((closest, current) => {
+        return Math.abs(new Date(current.date) - now) <
+          Math.abs(new Date(closest.date) - now)
+          ? current
+          : closest;
+      });
 
-  ctx.app.emit("list", ctx, result, result.length);
+      return {
+        ...item,
+        reservations,
+        times: lastCon.times,
+        date: lastCon.date,
+        coordinates: lastCon.coordinates,
+      };
+    });
+
+    const sortReservations = (reservations) => {
+      return reservations
+        .slice() // 复制数组，避免修改原数据
+        .sort((a, b) => {
+          // 按离当前日期的距离排序
+          const diffA = Math.abs(new Date(a.date) - now);
+          const diffB = Math.abs(new Date(b.date) - now);
+          if (diffA !== diffB) return diffA - diffB;
+        });
+    };
+
+    const sortTypeFn = (reservations, sortType) => {
+      return reservations
+        .slice() // 复制数组，避免修改原数据
+        .sort((a, b) => {
+          switch (sortType) {
+            case "1":
+              return (
+                (parseFloat(b.averageRating) || 0) -
+                (parseFloat(a.averageRating) || 0)
+              );
+            case "2":
+              return (
+                (b.reservations.length || 0) - (a.reservations.length || 0)
+              );
+            case "3":
+              return (b.totalVisits || 0) - (a.totalVisits || 0);
+            default:
+              return 0;
+          }
+        });
+    };
+
+    ctx.app.emit(
+      "list",
+      ctx,
+      sortTypeFn(sortReservations(newResult), sortType),
+      result.length
+    );
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 module.exports = {

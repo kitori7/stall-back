@@ -4,6 +4,7 @@ class LocationController {
   async create(ctx) {
     const { locationName, availableWeekdays, availableTime, coordinates } =
       ctx.request.body;
+
     const location = await LocationService.getLocationName(locationName);
     if (location.length > 0) {
       return ctx.app.emit(
@@ -24,14 +25,7 @@ class LocationController {
   async update(ctx) {
     const { id } = ctx.params;
     const { locationName, availableWeekdays, availableTime } = ctx.request.body;
-    const location = await LocationService.getLocationName(locationName);
-    if (location.length > 0) {
-      return ctx.app.emit(
-        "error",
-        ERROR_TYPE.LOCATION_NAME_ALREADY_EXISTS,
-        ctx
-      );
-    }
+    console.log(id);
     await LocationService.update(id, {
       locationName,
       availableWeekdays,

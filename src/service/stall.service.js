@@ -234,20 +234,21 @@ SELECT
     s.average_rating AS averageRating,
     s.total_revenue AS totalRevenue,
     s.total_visits AS totalVisits,
-    r.times,
-    r.date,
-    (SELECT l.coordinates FROM location l WHERE l.id = r.location_id) AS coordinates
+    COALESCE(
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'times', r.times,
+                'date', r.date,
+                'coordinates', (SELECT l.coordinates FROM location l WHERE l.id = r.location_id)
+            )
+        ), '[]'
+    ) AS reservations
 FROM 
     stall s
 LEFT JOIN 
     reservation r ON s.id = r.stall_id
 WHERE 
     s.status = '1' 
-    AND r.date = (
-        SELECT MAX(r2.date) 
-        FROM reservation r2 
-        WHERE r2.stall_id = s.id
-    )
     `;
     const params = [];
     if (stallName) {
@@ -255,23 +256,6 @@ WHERE
       params.push(`%${stallName}%`);
     }
     sql += ` GROUP BY s.id`;
-
-    let orderByClause = `ORDER BY ABS(DATEDIFF(r.date, CURDATE()))`;
-    switch (sortType) {
-      case "1":
-        orderByClause += `, CAST(s.average_rating AS DECIMAL) DESC`;
-        break;
-      case "2":
-        orderByClause += `, (SELECT COUNT(*) FROM reservation WHERE stall_id = s.id) DESC`;
-        break;
-      case "3":
-        orderByClause += `, s.total_visits DESC`;
-        break;
-      default:
-        break;
-    }
-
-    sql += ` ${orderByClause}`;
 
     if (offset && pageSize) {
       sql += ` LIMIT ?, ?`;
