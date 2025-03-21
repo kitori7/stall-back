@@ -6,12 +6,12 @@ const StallService = require("../service/stall.service");
 class StallUserController {
   async register(ctx) {
     const { username, password, phoneNumber, roleType } = ctx.request.body;
-    await StallUserService.createUser({
+    await StallUserService.createUser(
       username,
       password,
       phoneNumber,
-      roleType,
-    });
+      roleType
+    );
     ctx.app.emit("success", ctx, true, "注册成功");
   }
 

@@ -1,5 +1,4 @@
 const Koa = require("koa");
-const userRouter = require("../router/user.router");
 const bodyParser = require("koa-bodyparser");
 const registerRouter = require("../router");
 

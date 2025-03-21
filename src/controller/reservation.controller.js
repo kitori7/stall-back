@@ -38,6 +38,42 @@ class ReservationController {
     await ReservationService.remove(id);
     ctx.app.emit("success", ctx, true, "预约删除成功");
   }
+
+  // 获取所有预约列表
+  async getReservationList(ctx) {
+    try {
+      const {
+        current = 1,
+        pageSize = 10,
+        stallName,
+        phoneNumber,
+        status,
+      } = ctx.request.body;
+      const offset = (current - 1) * pageSize;
+      const reservationList = await ReservationService.getReservationList(
+        offset,
+        pageSize,
+        stallName,
+        phoneNumber,
+        status
+      );
+      ctx.app.emit("list", ctx, reservationList, reservationList.length);
+    } catch (error) {
+      ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);
+    }
+  }
+
+  // 审核预约
+  async auditReservation(ctx) {
+    try {
+      const { id } = ctx.params;
+      const { status, reason } = ctx.request.body;
+      await ReservationService.auditReservation(id, status, reason);
+      ctx.app.emit("success", ctx, true);
+    } catch (error) {
+      ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);
+    }
+  }
 }
 
 module.exports = new ReservationController();

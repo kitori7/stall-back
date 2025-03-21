@@ -30,7 +30,6 @@ class DataController {
         paymentLine,
       });
     } catch (error) {
-      console.log(error);
       ctx.app.emit("error", ctx, ERROR_TYPE.SERVER_ERROR);
     }
   }
