@@ -12,9 +12,14 @@ class ReservationService {
       JSON.stringify(times),
       locationId,
       stallId,
-      "0",
+      "0", // 初始状态为待审核
     ]);
-    if (isAutoAudit) await this.auditReservation(result.insertId, "2");
+
+    // 如果开启自动审核，则自动设置为审核通过
+    if (isAutoAudit) {
+      await this.auditReservation(result.insertId, "2"); // 2 表示审核通过
+    }
+
     return result;
   }
 

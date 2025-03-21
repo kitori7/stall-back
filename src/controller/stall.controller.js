@@ -238,19 +238,31 @@ const mobileList = async (ctx) => {
         reservations,
         times: lastCon.times,
         date: lastCon.date,
+        reservationStatus: lastCon.status,
         coordinates: lastCon.coordinates,
       };
     });
 
     const sortReservations = (reservations) => {
-      return reservations
-        .slice() // 复制数组，避免修改原数据
-        .sort((a, b) => {
-          // 按离当前日期的距离排序
-          const diffA = Math.abs(new Date(a.date) - now);
-          const diffB = Math.abs(new Date(b.date) - now);
-          if (diffA !== diffB) return diffA - diffB;
-        });
+      const statusPriority = {
+        3: 0, // 已完成
+        2: 1, // 审核通过
+        1: 2, // 审核不通过
+        0: 3, // 待审核
+      };
+
+      const now = new Date();
+
+      return [...reservations].sort((a, b) => {
+        // 首先按状态优先级排序
+        const statusDiff = statusPriority[a.status] - statusPriority[b.status];
+        if (statusDiff !== 0) return statusDiff;
+
+        // 状态相同时按日期距离排序
+        return (
+          Math.abs(new Date(a.date) - now) - Math.abs(new Date(b.date) - now)
+        );
+      });
     };
 
     const sortTypeFn = (reservations, sortType) => {

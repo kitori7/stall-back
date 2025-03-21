@@ -239,6 +239,7 @@ SELECT
             JSON_OBJECT(
                 'times', r.times,
                 'date', r.date,
+                'status', r.status,
                 'coordinates', (SELECT l.coordinates FROM location l WHERE l.id = r.location_id)
             )
         ), '[]'
