@@ -98,7 +98,7 @@ class ReservationService {
 
   // 修改预约状态
   async auditReservation(id, status, reason) {
-    // TODO: 发送通知
+    // 更新状态
     let sql = `UPDATE reservation SET status = ?`;
     const params = [];
     if (reason) {

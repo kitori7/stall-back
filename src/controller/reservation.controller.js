@@ -1,13 +1,19 @@
 const ERROR_TYPE = require("../config/error");
 const ReservationService = require("../service/reservation.service");
+const noticeController = require("./notice.controller");
 
 class ReservationController {
   // 创建预约
   async create(ctx) {
     try {
       const { date, times, locationId, stallId } = ctx.request.body;
-      await ReservationService.create(date, times, locationId, stallId);
-
+      const res = await ReservationService.create(
+        date,
+        times,
+        locationId,
+        stallId
+      );
+      await noticeController.sendReservationNotice(res.insertId, "0");
       ctx.app.emit("success", ctx, true, "预约创建成功");
     } catch (error) {
       ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);
@@ -69,6 +75,7 @@ class ReservationController {
       const { id } = ctx.params;
       const { status, reason } = ctx.request.body;
       await ReservationService.auditReservation(id, status, reason);
+      await noticeController.sendReservationNotice(id, status, reason);
       ctx.app.emit("success", ctx, true);
     } catch (error) {
       ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);

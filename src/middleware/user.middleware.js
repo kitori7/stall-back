@@ -70,7 +70,6 @@ const verifyAuth = async (ctx, next) => {
     ctx.user = decoded;
     await next();
   } catch (error) {
-    console.log(error);
     return ctx.app.emit("error", ERROR_TYPE.UNAUTHORIZED, ctx);
   }
 };
