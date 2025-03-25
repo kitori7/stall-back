@@ -26,7 +26,7 @@ class NoticeService {
     `;
 
     const [result] = await connection.execute(sql, [stallId]);
-    return result[0].count;
+    return result[0];
   }
 
   // 已读通知
@@ -42,11 +42,12 @@ class NoticeService {
         id, 
         stall_id as stallId, 
         type, 
-        content, 
+        content,
+        is_read as isRead,
         created_at as createdAt 
       FROM notice 
       WHERE stall_id = ? 
-      ORDER BY created_at DESC
+      ORDER BY is_read ASC, created_at DESC
     `;
 
     const [result] = await connection.execute(sql, [stallId]);
@@ -61,6 +62,7 @@ class NoticeService {
         n.stall_id as stallId, 
         n.type, 
         n.content, 
+        n.is_read as isRead,
         n.created_at as createdAt,
         au.username as adminName,
         s.stall_name as stallName

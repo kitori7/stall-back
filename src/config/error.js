@@ -9,6 +9,7 @@ const ERROR_TYPE = {
   USER_STATUS_NOT_PASSED: "user_status_not_passed",
   STALL_STATUS_DISABLE: "stall_status_disable",
   LOCATION_NAME_ALREADY_EXISTS: "location_name_already_exists",
+  USER_PERMISSION_NOT_EXIST: "user_permission_not_exist",
 };
 
 module.exports = ERROR_TYPE;

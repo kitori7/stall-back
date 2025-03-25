@@ -44,7 +44,7 @@ class NoticeController {
     try {
       const { stallId } = ctx.params;
       const count = await noticeService.getUnreadNoticeCount(stallId);
-      ctx.app.emit("success", ctx, true, count);
+      ctx.app.emit("success", ctx, count["COUNT(*)"]);
     } catch (error) {
       ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);
     }
@@ -68,7 +68,13 @@ class NoticeController {
     try {
       const { stallId } = ctx.params;
       const result = await noticeService.getNoticeListByStallId(stallId);
-      ctx.app.emit("list", ctx, result, result.length);
+      const list = result.map((item) => {
+        return {
+          ...item,
+          isRead: item.isRead === "1" ? true : false,
+        };
+      });
+      ctx.app.emit("list", ctx, list, list.length);
     } catch (error) {
       ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);
     }
@@ -83,7 +89,13 @@ class NoticeController {
         adminName,
         type
       );
-      ctx.app.emit("list", ctx, result, result.length);
+      const list = result.map((item) => {
+        return {
+          ...item,
+          isRead: item.isRead === "1" ? true : false,
+        };
+      });
+      ctx.app.emit("list", ctx, list, list.length);
     } catch (error) {
       ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);
     }

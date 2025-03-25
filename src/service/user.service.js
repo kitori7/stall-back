@@ -132,6 +132,12 @@ class UserService {
     ]);
     return result;
   }
+
+  async queryUser(username, password) {
+    const sql = "SELECT * FROM admin_user WHERE username = ? AND password = ?";
+    const [result] = await connection.execute(sql, [username, password]);
+    return result;
+  }
 }
 
 module.exports = new UserService();

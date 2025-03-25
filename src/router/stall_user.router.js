@@ -33,4 +33,10 @@ stallUserRouter.get("/:id", stallUserController.detail);
 // 修改摊位用户头像
 stallUserRouter.patch("/avatar/:id", stallUserController.updateAvatar);
 
+// 注册摊位管理员
+stallUserRouter.post(
+  "/register/admin",
+  handlePassword,
+  stallUserController.registerAdmin
+);
 module.exports = stallUserRouter;

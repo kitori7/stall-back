@@ -46,6 +46,10 @@ app.on("error", (error, ctx) => {
       code = -1010;
       message = "位置名称已存在";
       break;
+    case ERROR_TYPE.USER_PERMISSION_NOT_EXIST:
+      code = -1011;
+      message = "该用户没有权限";
+      break;
     default:
       code = -1000;
       message = "未知错误";
