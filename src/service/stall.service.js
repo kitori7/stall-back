@@ -104,6 +104,7 @@ class StallService {
         stall.individual_business_license AS individualImg,
         stall.average_rating AS averageRating,
         stall.total_ratings AS totalRatings,
+        stall.average_star AS averageStar,
         (SELECT JSON_OBJECT(
             'reservationId', r.id,
             'times', r.times,
@@ -296,6 +297,17 @@ WHERE
       SET total_visits = (SELECT COUNT(*) FROM stall_visit WHERE stall_id = ?)
       WHERE id = ?;`;
     const [result] = await connection.execute(sql, [stallId, stallId]);
+    return result;
+  }
+
+  // 更新摊位平均星
+  async updateStallAverageStar(stallId) {
+    const sql = `UPDATE stall 
+      SET 
+        total_star = (SELECT COUNT(*) FROM \`check\` WHERE stall_id = ?),
+        average_star = (SELECT AVG(star_level) FROM \`check\` WHERE stall_id = ?)
+      WHERE id = ?;`;
+    const [result] = await connection.execute(sql, [stallId, stallId, stallId]);
     return result;
   }
 

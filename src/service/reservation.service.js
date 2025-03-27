@@ -45,7 +45,8 @@ class ReservationService {
         r.created_at AS createdAt
       FROM reservation r
       LEFT JOIN location l ON r.location_id = l.id
-      WHERE r.stall_id = ?`;
+      WHERE r.stall_id = ?
+      ORDER BY r.created_at DESC`;
     const [result] = await connection.execute(sql, [stallId]);
     return result;
   }

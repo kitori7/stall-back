@@ -95,6 +95,13 @@ class PaymentService {
 
     return mergedData;
   }
+
+  // 根据摊位 id 获取所有支付记录
+  async getPaymentsByStallId(stallId) {
+    const sql = `SELECT amount, created_at AS createdAt, id FROM stall_payment WHERE stall_id = ?`;
+    const [result] = await connection.execute(sql, [stallId]);
+    return result;
+  }
 }
 
 module.exports = new PaymentService();

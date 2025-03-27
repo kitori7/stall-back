@@ -36,6 +36,9 @@ class NoticeController {
     } else if (status === "0") {
       const content = `您的摊位"${stallName}"在【${locationName}】位置申请的${date} ${times}时段预约已提交审核。请耐心等待审核结果。`;
       await noticeService.sendNotice(stallId, "0", content);
+    } else if (status === "3") {
+      const content = `您的摊位"${stallName}"在【${locationName}】位置申请的${date} ${times}时段预约已被打卡。打卡备注为：${reason}`;
+      await noticeService.sendNotice(stallId, "0", content);
     }
   }
 

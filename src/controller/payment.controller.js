@@ -12,6 +12,16 @@ class PaymentController {
       ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);
     }
   }
+
+  async getPaymentsByStallId(ctx) {
+    try {
+      const { stallId } = ctx.params;
+      const payments = await paymentService.getPaymentsByStallId(stallId);
+      ctx.app.emit("list", ctx, payments, payments.length);
+    } catch (error) {
+      ctx.app.emit("error", ERROR_TYPE.SERVER_ERROR, ctx);
+    }
+  }
 }
 
 module.exports = new PaymentController();
