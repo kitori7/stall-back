@@ -108,9 +108,14 @@ class StallService {
         (SELECT JSON_OBJECT(
             'reservationId', r.id,
             'times', r.times,
-            'date', r.date
+            'date', r.date,
+            'locationId', l.id,
+            "reservationStatus",r.status,
+            'locationCoordinates', l.coordinates,
+            'locationName', l.location_name
          ) 
-         FROM reservation r 
+         FROM reservation r
+         LEFT JOIN location l ON l.id = r.location_id
          WHERE r.stall_id = stall.id 
          ORDER BY ABS(DATEDIFF(r.date, CURDATE())) 
          LIMIT 1) AS reservationInfo,

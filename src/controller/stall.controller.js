@@ -207,6 +207,13 @@ const disable = async (ctx) => {
   ctx.app.emit("success", ctx, true, "禁用成功");
 };
 
+// 启用摊位
+const enable = async (ctx) => {
+  const { id } = ctx.params;
+  await StallService.editStallStatus(id, "1");
+  ctx.app.emit("success", ctx, true, "启用成功");
+};
+
 // 移动端获取摊位列表
 const mobileList = async (ctx) => {
   try {
@@ -307,5 +314,6 @@ module.exports = {
   audit,
   reject,
   disable,
+  enable,
   mobileList,
 };
